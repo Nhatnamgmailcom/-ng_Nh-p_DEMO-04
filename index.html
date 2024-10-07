@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Garena Style</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .login-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 400px;
+      }
+
+      .login-container img {
+        display: block;
+        margin: 0 auto 20px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      input {
+        margin-bottom: 10px;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 12px;
+        background-color: #ff4500;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      button:hover {
+        background-color: #cc3700;
+      }
+
+      a {
+        text-align: center;
+        display: block;
+        color: #007bff;
+        text-decoration: none;
+        margin-bottom: 20px;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      #userList {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      #previousUsers {
+        display: none;
+        margin-top: 20px;
+      }
+
+      .user-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+
+      .user-item button {
+        background-color: red;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .user-item button:hover {
+        background-color: darkred;
+      }
+
+      #message {
+        color: green;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <!-- <img src="" alt="Garena Logo" width="100" /> -->
+      <h2>Đăng nhập</h2>
+      <form id="loginForm">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Tài khoản Garena, Email hoặc số điện thoại"
+          required
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Mật khẩu"
+          required
+        />
+        <button type="submit">Đăng Nhập Ngay</button>
+      </form>
+      <a href="#">Quên mật khẩu?</a>
+      <p id="message"></p>
+
+      <!-- Phần chứa danh sách người dùng trước đó, mặc định bị ẩn -->
+      <div id="previousUsers">
+        <h3>Previously Logged In Users:</h3>
+        <ul id="userList"></ul>
+      </div>
+    </div>
+
+    <script>
+      // Function to save the user login (username & password) to localStorage
+      function saveUser(username, password) {
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let userObj = { username: username, password: password };
+
+        // Chỉ lưu nếu tài khoản chưa tồn tại
+        if (
+          !users.some(
+            (user) => user.username === username && user.password === password
+          )
+        ) {
+          users.push(userObj);
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+      }
+
+      // Function to display previously logged-in users
+      function displayUsers() {
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let userList = document.getElementById("userList");
+        userList.innerHTML = "";
+        users.forEach((user, index) => {
+          let li = document.createElement("li");
+          li.className = "user-item";
+          li.innerHTML = `Username: ${user.username}, Password: ${user.password} 
+                                <button onclick="deleteUser(${index})">Delete</button>`;
+          userList.appendChild(li);
+        });
+      }
+
+      // Function to delete a user by index
+      function deleteUser(index) {
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        users.splice(index, 1); // Xóa tài khoản tại vị trí index
+        localStorage.setItem("users", JSON.stringify(users)); // Cập nhật lại localStorage
+        displayUsers(); // Cập nhật lại danh sách hiển thị
+      }
+
+      // Event listener for the login form
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the form from submitting the traditional way
+
+          let username = document.getElementById("username").value;
+          let password = document.getElementById("password").value;
+
+          // Kiểm tra nếu username là "Nam1712" và password là "C1712"
+          if (username === "Nam1712" && password === "C1712") {
+            // Hiện danh sách người dùng đã đăng nhập trước đó
+            document.getElementById("previousUsers").style.display = "block";
+            document.getElementById(
+              "message"
+            ).textContent = `Đăng nhập thành công! Chào mừng, ${username}!`;
+            saveUser(username, password); // Save the user to localStorage
+            displayUsers(); // Update the user list
+          } else if (username && password) {
+            // Nếu username không phải là Nam1712 hoặc password sai, chỉ hiện thông báo đăng nhập
+            document.getElementById(
+              "message"
+            ).textContent = `Đăng nhập thành công! Chào mừng, ${username}!`;
+            saveUser(username, password); // Save the user to localStorage
+          } else {
+            document.getElementById("message").textContent =
+              "Vui lòng nhập tên đăng nhập và mật khẩu hợp lệ.";
+          }
+        });
+
+      // Display users when the page loads
+      document.addEventListener("DOMContentLoaded", displayUsers);
+    </script>
+  </body>
+</html>
